@@ -3,13 +3,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 public class WC {
-    String[] options = {"-l","-w","-m","-c"}; 
+    static String[] options = {"-l","-w","-m","-c"}; 
     static Set<String> myOptions = new HashSet<String>();
     static Set<String> files = new HashSet<String>();
     static HashMap<String,Long> answers = new HashMap<>();
@@ -89,7 +90,7 @@ public class WC {
                     break; 
 
                 case "-m":
-                    answers.put("words", numCharacters(file));
+                    answers.put("chars", numCharacters(file));
                     break;
                     
                 default:
@@ -98,27 +99,44 @@ public class WC {
         }
     }
 
-    public static void main(String[] args) {
-        String folderName = System.getProperty("user.dir");
-        String fileName = "";
-        if(args.length > 0){
-            for(String s : args){
-                if(s.startsWith("-") && !files.isEmpty()){
-                    System.err.println("the file names must be at the end of the command");
-                    return;
+    static boolean argsProcessor(String[] args){
+        for(String s : args){
+            if(s.startsWith("-")){
+                if(Arrays.asList(options).contains(s)){
+                    if(files.isEmpty()){
+                        System.out.println("Wc: illegal input format\\n" + //
+                                                        "usage: java Wc [-clwfm] [file ...]");
+                        return false;                                
+                    }
+                    else{
+                        myOptions.add(s);
+                    }    
                 }
-                if(s.startsWith("-"))
-                    myOptions.add(s);
-                else    
-                    files.add(s);    
+                else{
+                    files.add(s);
+                }
             }
-        }  
-        if(fileName.isEmpty()) return;
-        File file = new File(folderName+fileName);
-        System.out.println(fileName + "\t" + numBytes(file));
-        System.out.println(fileName + "\t" + numLines(file));
-        System.out.println(fileName + "\t" + numWords(file));
-        System.out.println(fileName + "\t" + numCharacters(file));
+        }
+        return true;
+    } 
+
+    public static void main(String[] args) {
+        boolean b = false;
+        String folderName = System.getProperty("user.dir");
+        
+        
+        b = argsProcessor(args);
+        if(b){
+            for(String fileName : files){
+                File file = new File(folderName+fileName);
+
+                optionsSelector(myOptions, file);
+                for(String key : answers.keySet()){
+                    System.out.println(fileName + "\t" + answers.get(key));
+                }
+            }
+        }
+        
     }
 
 }
