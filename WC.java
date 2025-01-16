@@ -75,6 +75,13 @@ public class WC {
     }
 
     static void optionsSelector(Set<String> options,File file){
+        if(options.isEmpty()){
+            answers.put("lines", numLines(file));
+            answers.put("bytes", numBytes(file));
+            answers.put("words", numWords(file));
+            answers.put("chars", numCharacters(file));
+            return;
+        }
         for(String option : options){
             switch (option) {
                 case "-l":
@@ -103,7 +110,7 @@ public class WC {
         for(String s : args){
             if(s.startsWith("-")){
                 if(Arrays.asList(options).contains(s)){
-                    if(files.isEmpty()){
+                    if(!files.isEmpty()){
                         System.out.println("Wc: illegal input format\\n" + //
                                                         "usage: java Wc [-clwfm] [file ...]");
                         return false;                                
@@ -112,9 +119,10 @@ public class WC {
                         myOptions.add(s);
                     }    
                 }
-                else{
-                    files.add(s);
-                }
+                
+            }
+            else{
+                files.add(s);
             }
         }
         return true;
@@ -123,12 +131,12 @@ public class WC {
     public static void main(String[] args) {
         boolean b = false;
         String folderName = System.getProperty("user.dir");
-        
+        System.out.println(folderName);
         
         b = argsProcessor(args);
         if(b){
             for(String fileName : files){
-                File file = new File(folderName+fileName);
+                File file = new File(folderName+"\\"+fileName);
 
                 optionsSelector(myOptions, file);
                 for(String key : answers.keySet()){
